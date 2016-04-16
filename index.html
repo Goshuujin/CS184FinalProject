@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<style>  
+		    div.padded {  
+		      padding-top: 0px;  
+		      padding-right: 100px;  
+		      padding-bottom: 0.25in;  
+		      padding-left: 100px;  
+		    }  
+	  	</style> 
+		<title>David Allen  |  CS 184</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<h1 align="middle">Final Project: Solar System Simulation</h1>
+		<h2 align="middle">David Allen</h2>
+		<div class="padded">
+			<p>I plan to create a fully animated simulation of the solar system. The simpulation will include texture mapped planets as well as a camera fly by of the planets while in simulation.</p>
+			<h2 align="middle">Background</h2>
+				<p>The problem I intend to solve is twofold. First I hope to learn about animation and efficiently interating with the scene and the camera. Secondly I want to simulate an actual physics modeled environment that could be used not only for scientific predictions, but for fun as well. This is important to me because I have always wanted to create a physics engine that was not only accurate but plesant to interact with. I also enjoy video games and would like to learn as much as I can to further my goal of building a 3D game. Others should care bout this because space exploration would not be possible without accurate simulations.</p>
+			<h2 align="middle">Resources</h2>
+				<p>I plan to build this from scratch using C++ and OpenGL. I have yet to find many resources for making this possible, however I know I will most likely be leaning on the <a href="https://www.opengl.org/wiki/Getting_Started">OpenGL documantation</a> pretty heavily. I will also be using textures from the <a href="http://maps.jpl.nasa.gov/">NASA/JPL solar system simulator</a>. I will also be using my MacBook Pro or the lab computers for the hardware.</p>
+			<h2 align="middle">Goals and Deliverables</h2>
+			<p>What I plan on delivering is a demo of the solar system simulation using an animated camera fly through, starting from Pluto and going all the way into the Sun. I order to accomplish this I must render the planets using mipmapping, create a Sun that is esentially a spherical light source to illuminate the scene, calculate and update the scene for animation at every time step, and create a camera fly by routine that takes into account its distance from a target and target location. What I hope to deliver as well is more interactivity with the scene by letting the user control the time step of the simulation and creating a initial over head view of the solar system with labels showing the location of the planets in real time. In order to accomplish these goals I will need to create an animated 2D overlay when the camera is at a certain position along with event handlers that move the camera to that position (as well as some to control the speed of the simulation). If I acomplish all of these goals I hope to add a few bells and whistles such as putting the rings on Saturn and Uranus as well as the atmosphere around Earth.</p>
+			<h2 align="middle">Schedule</h2>
+				<ul> 
+					<li>Render the solar system with texture mapped planets.</li>
+					<li>Accurately animate and simulate the solar system.</li>
+					<li>Create a camera fly by of the simulation.</li>
+					<li>Create an birds eye view with 2D overlay labeling planets.</li>
+					<li>Speed up or slow down the simulation with user input.</li>
+				</ul>
+		</div>
+		
+	</body>
+</html>
