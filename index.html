@@ -1,37 +1,114 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-	<head>
-		<style>  
-		    div.padded {  
-		      padding-top: 0px;  
-		      padding-right: 100px;  
-		      padding-bottom: 0.25in;  
-		      padding-left: 100px;  
-		    }  
-	  	</style> 
-		<title>David Allen  |  CS 184</title>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	</head>
-	<body>
-		<h1 align="middle">Final Project: Solar System Simulation</h1>
-		<h2 align="middle">David Allen</h2>
-		<div class="padded">
-			<p>I plan to create a fully animated simulation of the solar system. The simpulation will include texture mapped planets as well as a camera fly by of the planets while in simulation.</p>
-			<h2 align="middle">Background</h2>
-				<p>The problem I intend to solve is twofold. First I hope to learn about animation and efficiently interating with the scene and the camera. Secondly I want to simulate an actual physics modeled environment that could be used not only for scientific predictions, but for fun as well. This is important to me because I have always wanted to create a physics engine that was not only accurate but plesant to interact with. I also enjoy video games and would like to learn as much as I can to further my goal of building a 3D game. Others should care bout this because space exploration would not be possible without accurate simulations.</p>
-			<h2 align="middle">Resources</h2>
-				<p>I plan to build this from scratch using C++ and OpenGL. I have yet to find many resources for making this possible, however I know I will most likely be leaning on the <a href="https://www.opengl.org/wiki/Getting_Started">OpenGL documantation</a> pretty heavily. I will also be using textures from the <a href="http://maps.jpl.nasa.gov/">NASA/JPL solar system simulator</a>. I will also be using my MacBook Pro or the lab computers for the hardware.</p>
-			<h2 align="middle">Goals and Deliverables</h2>
-			<p>What I plan on delivering is a demo of the solar system simulation using an animated camera fly through, starting from Pluto and going all the way into the Sun. I order to accomplish this I must render the planets using mipmapping, create a Sun that is esentially a spherical light source to illuminate the scene, calculate and update the scene for animation at every time step, and create a camera fly by routine that takes into account its distance from a target and target location. What I hope to deliver as well is more interactivity with the scene by letting the user control the time step of the simulation and creating a initial over head view of the solar system with labels showing the location of the planets in real time. In order to accomplish these goals I will need to create an animated 2D overlay when the camera is at a certain position along with event handlers that move the camera to that position (as well as some to control the speed of the simulation). If I acomplish all of these goals I hope to add a few bells and whistles such as putting the rings on Saturn and Uranus as well as the atmosphere around Earth.</p>
-			<h2 align="middle">Schedule</h2>
-				<ul> 
-					<li>Render the solar system with texture mapped planets.</li>
-					<li>Accurately animate and simulate the solar system.</li>
-					<li>Create a camera fly by of the simulation.</li>
-					<li>Create an birds eye view with 2D overlay labeling planets.</li>
-					<li>Speed up or slow down the simulation with user input.</li>
-				</ul>
-		</div>
-		
-	</body>
+    <head>
+        <style>  
+            div.padded {  
+              padding-top: 0px;  
+              padding-right: 100px;  
+              padding-bottom: 0.25in;  
+              padding-left: 100px;  
+            }  
+        </style> 
+        <title>David Allen  |  CS 184</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
+        <h1 align="middle">Final Report: Solar System Simulation</h1>
+        <h2 align="middle">David Allen</h2>
+        <div class="padded">
+            <h3><u>Abstract</u></h3>
+            <p>I made a fully visualized and animated simulation of the Solar System. At present it only includes all of the major planetary objects in the solar system. Future iterations will hopefully include all of the moons as well as the asteroid belts and known comets. This simulation also includes limited interactivity in the form of close up views of the planets and a rudimentary fly by of the solar system from Pluto to the Sun. </p>
+            <h3><u>Technical Approach</u></h3>
+            <p>The first thing I needed to do was learn how modern openGL draws things to the screen. Using various tutorials and the openGL documentation I learned that to draw something to the screen I needed to create an array that includes all of the vertecies of the triangles as well as the texture coordinates for those vertecies. This is a big change from older openGL using tools like glut, where you could calculate and draw points on the fly. Modern openGL is also very much more low level than older openGL, in that I have to pass data to the openGL directly as well as all at once. This required me to pre-calculate all the points in the models that I needed before sending their data to openGL. For some things, such as the orbital lines, this was easy, just send in the array I was using to hold the data points. For other things, such as sphere and circle generation, I needed to precompute all the points I needed first.</p>
+            <p>To create the spheres that will be the base model for the planets I used a simple to understand subdivision technique. For this technique you first create a unit octohedron consisting of six vertecies that create eight triangle faces. You then take each triangle face and divide it into four triangle faces by creating a vertex at the midpoint of each triangle side. Then you take these new vertecies and push them out until they are also at unit length away from the center of the sphere in progress. For my spheres I used a total of six subdivisions.</p>
+            <div align="center">
+                <table style="width=100%">
+                    <tr>
+                        <td align="middle">
+                        <img src="assets/sub_ex.png" width="960px" />
+                        <figcaption align="middle">Subdivision process to make a sphere</figcaption>
+                    </tr>
+                </table>
+            </div>
+            <p>The next thing I did was impliment the drawing of 2d circles around the planets for better visualization at super far zoom values. To do this I modified an implimentation that I found <a href="http://slabode.exofire.net/circle_draw.shtml">here.</a> Basically the algorithim uses a little bit of trigonometry to create a series of vertecies that will aproximate a circle. Taking the initial radial vector (the vector from the center of the circle to the edge) it finds the initial point to start at (the one that is radius away from the center on the x axis). Then it finds the vector that is tangent to the initial vector and scales it down to the correct length by multiplying it by the tangent of the angle between radial vectors. Then it is added to the initial radial vector to get the next radial vector. But this vector is too long, so it is scaled by the cosine of the angle between radial vectors. This gives the next vertex in the circle approximation as well as the next starting radial vector. Continuing this process num_segments times gives a nice circle approximation, if num_segments is large enough.</p>
+            <p>Now that I had a sphere with a circle around it, I needed to make it rotate on its axis, place it in the proper starting location, and tilt it to the correct orientation. To do this I created a variable to store its current location in world space and its radius. I then created a model transformation matrix for each sphere that consisted of a scale by the radius, a rotation based on time, a rotation to tilt the spheres axis, and finally a translation to the point in world space. For the outlining 2d circles I only performed the translation and scale. This is done for each frame as all of the objects are created at the origin and are unit length in size. </p>
+            <p>The only thing left to animate at this point is the actual gravitational movement of the planets. This is done by updating the variable that contains the planets current location via the gravitational update function. The gravitational update function uses the vector form of Newtons Universal Law of Gravitation shown here:</p>
+            <p align="middle"><pre align="middle">F12 = -G * ((m1 * m2) / ((r2 - r1) ^ 2)) * r12_unit</pre></p>
+            <p align="middle"><pre align="middle">G = 6.6741×10−11 N⋅m^2/kg^2</pre></p>
+            <p align="middle"><pre align="middle">m = mass of object in kg</pre></p>
+            <p align="middle"><pre align="middle">r = position of object in m</pre></p>
+            <p align="middle"><pre align="middle">r12_unit = direction vector of object 1 to object 2</pre></p>
+            <p>Using this equation I update each planets position (excluding the sun). I do this by applying and summing up the force (F12) that each planet exerts on a target planet to get an acceleration vector. Multiplying this vector by a time produces a velocity vector. This velocity vector is then added to the initial velocity vector of the planet, giving a new velocity (aka direction and distance). Once all of the planets' velocity vectors have been updated I add the velocity to the cerrent position of the planet to move it to the correct place. This function is called once every frame to accurately simulate the movement of the planets.</p>
+            <p>Now the planets are fully simulated, it's time to add the bells and whistles. I added dashed lines to the scene to show where the planets have been and to show what their orbits look like in real time. To do this I made an array for each planet to hold its previous positions every thirty frames. This array I render seperately as the vertecies are already in world space and they don't require any texture mapping (I render the outlining circles in teh same manner). The approach I used to do this was to allocate space in openGL first and then use glBufferSubData function to update the openGL buffer on every render. In retrospect this approach seems needlessly complicated and limited, however it does have the benefit of not using up all of my computers memory during longer simulations. </p>
+            <p>To make the planets look like planets I applied texture maps to them. OpenGL has a nifty function that will create a mipmap directly from an input image, thus all the textures applied are interpolated depending on the distance from the camera. The hard part comes when I tried to map points from teh sphere onto a 2d texture. To do this I calculate the polar coordinates from the cartesian coordinates on the sphere in the shader. By dividing the theta angle by two PI and the phi angle by PI, then adding 0.5 I get a normalized coordinate for u and v in the texture space. Calculating the uv coordinates in the shader helps alliviate the seam that happens when mapping a 2d texture to a 3d object.</p>
+            <p>Lastly I wanted to make the camera fly by each of the planets. To do this I used the glm function lookAt to make the camera look at a particular planets center position. I then updated the position of the camera by 1/60th of the distance to the planet that the camera is looking at. Once the camera gets to a certain distance from the planet I slow down the camera until it got to the planet. After that the camera looks at the next planet down the line and starts moving towards that planet.</p>
+            <h3><u>Results</u></h3>
+            <p>Here are images of the sphere creation process, along with a chosen few textures applied to them to create the planets.</p>
+            <div align="center">
+                <table style="width=100%">
+                    <tr>
+                        <td align="middle">
+                        <img src="assets/octo.png" width="480px" />
+                        <figcaption align="middle">Initial octohedron used to generate spheres </figcaption>
+                        <td align="middle">
+                        <img src="assets/sub_once.png" width="480px" />
+                        <figcaption align="middle">Ocothedron after one subdivision </figcaption>
+                    </tr>
+                </table>
+            </div>
+            <div align="center">
+                <table style="width=100%">
+                    <tr>
+                        <td align="middle">
+                        <img src="assets/sphere.png" width="480px" />
+                        <figcaption align="middle">Finished generated sphere </figcaption>
+                        <td align="middle">
+                        <img src="assets/sun.png" width="480px" />
+                        <figcaption align="middle">Sphere with sun texture applied </figcaption>
+                    </tr>
+                </table>
+            </div>
+            <div align="center">
+                <table style="width=100%">
+                    <tr>
+                        <td align="middle">
+                        <img src="assets/saturn.png" width="480px" />
+                        <figcaption align="middle">Sphere with saturn texture and lighting applied </figcaption>
+                        <td align="middle">
+                        <img src="assets/earth.png" width="480px" />
+                        <figcaption align="middle">Sphere with earth texture and lighting applied </figcaption>
+                    </tr>
+                </table>
+            </div>
+            <div align="center">
+                <table style="width=100%">
+                    <tr>
+                        <td align="middle">
+                        <img src="assets/close.png" width="480px" />
+                        <figcaption align="middle">Orbital Lines (Zoomed In) </figcaption>
+                        <td align="middle">
+                        <img src="assets/far.png" width="480px" />
+                        <figcaption align="middle">Orbital Lines (Zoomed Out) </figcaption>
+                    </tr>
+                </table>
+            </div>
+            <div align="center">
+                <table style="width=100%">
+                    <tr>
+                        <td align="middle">
+                        <img src="assets/fly_by_gif.gif" width="960px" />
+                        <figcaption align="middle">Low Res Gif of solar system fly by </figcaption>
+                    </tr>
+                </table>
+            </div>
+            <h3><u>References</u></h3>
+            <p><a href="http://maps.jpl.nasa.gov/">NASA/JPL solar system simulator</a></p>
+            <p><a href="https://www.opengl.org/wiki/Getting_Started">OpenGL documantation</a></p>
+            <p><a href="http://slabode.exofire.net/circle_draw.shtml">An Efficient Way to Draw Approximate Circles in OpenGL</a></p>
+            <p><a href="http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/">Improvements to the canonical one-liner GLSL rand() for OpenGL ES 2.0</a></p>
+            <p><a href="https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation">Newton's law of universal gravitation</a></p>
+            <p><a href="http://stackoverflow.com/questions/7687148/drawing-sphere-in-opengl-without-using-glusphere">Drawing Sphere in OpenGL without using gluSphere()?</a>
+        </div>
+        
+    </body>
 </html>
